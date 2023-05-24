@@ -1,0 +1,33 @@
+<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Page"
+    mc:Ignorable="d">
+
+    <controls:CircularPanel
+        ArcStart="@[Arc Start:DoubleSlider:3.14:-6.3-6.3]"
+        ArcStartIncluded="@[Arc Start Included:Bool:true]"
+        ArcEnd="@[Arc End:DoubleSlider:0:-6.3-6.3]"
+        ArcEndIncluded="@[Arc End Included:Bool:true]"
+        IsOriginAtCentre="@[Is Origin At Centre:Bool:false]"
+        >
+        <controls:CircularPanel.Children>
+            <Ellipse Fill="Red" Width="@[Child Width:Slider:24:1-200]" Height="@[Child Height:Slider:24:1-200]" />
+            <Ellipse Fill="OrangeRed" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="DarkOrange" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Orange" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Yellow" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="GreenYellow" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="SpringGreen" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="LimeGreen" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Green" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Blue" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Indigo" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="DarkViolet" Width="@[Child Width]" Height="@[Child Height]" />
+            <Ellipse Fill="Purple" Width="@[Child Width]" Height="@[Child Height]" />
+        </controls:CircularPanel.Children>
+    </controls:CircularPanel>
+</Page>

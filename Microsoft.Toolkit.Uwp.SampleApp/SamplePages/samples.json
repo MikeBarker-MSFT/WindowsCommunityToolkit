@@ -288,6 +288,16 @@
         "DocumentationUrl": "https://raw.githubusercontent.com/MicrosoftDocs/WindowsCommunityToolkitDocs/master/docs/controls/RadialCanvas.md"
       },
       {
+        "Name": "CircularPanel",
+        "Type": "CircularPanelPage",
+        "Subcategory": "Layout",
+        "About": "The CircularPanel layout arranges its children upon a circle.",
+        "CodeUrl": "https://github.com/CommunityToolkit/WindowsCommunityToolkit/tree/main/Microsoft.Toolkit.Uwp.UI.Controls.Layout/CircularPanel",
+        "XamlCodeFile": "CircularPanelXaml.bind",
+        "Icon": "/SamplePages/CircularPanel/CircularPanel.png",
+        "DocumentationUrl": "https://raw.githubusercontent.com/MicrosoftDocs/WindowsCommunityToolkitDocs/master/docs/controls/CircularPanel.md"
+      },
+      {
         "Name": "Menu",
         "Type": "MenuPage",
         "Subcategory": "Menus and Toolbars",
