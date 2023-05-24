@@ -12,13 +12,12 @@ using Windows.UI.Xaml.Controls;
 namespace Microsoft.Toolkit.Uwp.UI.Controls
 {
     /// <summary>
-    /// Defines an area within which you can explicitly position child objects, using
-    /// polar coordinates that are relative to the <see cref="CircularPanel"/> area.
+    /// Defines an area within which child objects are laid out in an ellipse.
     /// </summary>
-    public class CircularPanel : Panel
+    public class EllipticalPanel : Panel
     {
-        internal static readonly double DefaultArcStart = -Math.PI / 2;
-        internal static readonly double DefaultArcEnd = (2 * Math.PI) + DefaultArcStart;
+        private static readonly double DefaultArcStart = -Math.PI / 2;
+        private static readonly double DefaultArcEnd = (2 * Math.PI) + DefaultArcStart;
 
         /// <summary>
         /// Gets the <see cref="ArcStart"/> XAML dependency property.
@@ -26,7 +25,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         public static DependencyProperty ArcStartProperty { get; } = DependencyProperty.Register(
             nameof(ArcStart),
             typeof(double),
-            typeof(CircularPanel),
+            typeof(EllipticalPanel),
             new(DefaultArcStart, HandleMeasure));
 
         /// <summary>
@@ -35,7 +34,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         public static DependencyProperty ArcEndProperty { get; } = DependencyProperty.Register(
             nameof(ArcEnd),
             typeof(double),
-            typeof(CircularPanel),
+            typeof(EllipticalPanel),
             new(DefaultArcEnd, HandleMeasure));
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         public static DependencyProperty ArcStartIncludedProperty { get; } = DependencyProperty.Register(
             nameof(ArcStartIncluded),
             typeof(bool),
-            typeof(CircularPanel),
+            typeof(EllipticalPanel),
             new(true, HandleMeasure));
 
         /// <summary>
@@ -53,7 +52,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         public static DependencyProperty ArcEndIncludedProperty { get; } = DependencyProperty.Register(
             nameof(ArcEndIncluded),
             typeof(bool),
-            typeof(CircularPanel),
+            typeof(EllipticalPanel),
             new(false, HandleMeasure));
 
         /// <summary>
@@ -62,14 +61,23 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         public static DependencyProperty IsOriginAtCentreProperty { get; } = DependencyProperty.Register(
             nameof(IsOriginAtCentre),
             typeof(bool),
-            typeof(CircularPanel),
+            typeof(EllipticalPanel),
+            new(true, HandleMeasure));
+
+        /// <summary>
+        /// Gets the <see cref="IsLayoutCircular"/> XAML dependency property.
+        /// </summary>
+        public static DependencyProperty IsLayoutCircularProperty { get; } = DependencyProperty.Register(
+            nameof(IsLayoutCircular),
+            typeof(bool),
+            typeof(EllipticalPanel),
             new(true, HandleMeasure));
 
         private static void HandleMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var circularPanel = (CircularPanel)d;
-            circularPanel.InvalidateMeasure();
-            circularPanel.InvalidateArrange();
+            var ellipticalPanel = (EllipticalPanel)d;
+            ellipticalPanel.InvalidateMeasure();
+            ellipticalPanel.InvalidateArrange();
         }
 
         /// <summary>
@@ -126,7 +134,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
         /// <summary>
         /// Gets or sets a value indicating whether the centre of the layout circle (on which the children are located)
-        /// is at the centre of the <see cref="CircularPanel"/>.
+        /// is at the centre of the <see cref="EllipticalPanel"/>.
         /// </summary>
         public bool IsOriginAtCentre
         {
@@ -134,7 +142,19 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             set { SetValue(IsOriginAtCentreProperty, value); }
         }
 
-        private double DesiredRadius { get; set; } = double.NaN;
+        /// <summary>
+        /// Gets or sets a value indicating whether the layout is circular where the X and Y radii
+        /// are equal, or elliptical where the layout is stretched to fill the space avilable.
+        /// </summary>
+        public bool IsLayoutCircular
+        {
+            get { return (bool)GetValue(IsLayoutCircularProperty); }
+            set { SetValue(IsLayoutCircularProperty, value); }
+        }
+
+        private double DesiredRadiusX { get; set; } = double.NaN;
+
+        private double DesiredRadiusY { get; set; } = double.NaN;
 
         private Point? DesiredTranslationVector { get; set; } = default;
 
@@ -155,7 +175,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         {
             if (this.Children.Count == 0)
             {
-                this.DesiredRadius = double.NaN;
+                this.DesiredRadiusX = double.NaN;
+                this.DesiredRadiusY = double.NaN;
                 this.DesiredTranslationVector = default;
                 return new(0, 0);
             }
@@ -165,7 +186,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 var child = this.Children[0];
                 child.Measure(availableSize);
 
-                this.DesiredRadius = 0;
+                this.DesiredRadiusX = 0;
+                this.DesiredRadiusY = 0;
                 this.DesiredTranslationVector = new(
                     availableSize.Width / 2,
                     availableSize.Height / 2);
@@ -183,7 +205,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                     maxChildHeight = Math.Max(child.DesiredSize.Height, maxChildHeight);
                 }
 
-                this.DesiredRadius = 0;
+                this.DesiredRadiusX = 0;
+                this.DesiredRadiusY = 0;
                 if (double.IsInfinity(availableSize.Width) && double.IsInfinity(availableSize.Height))
                 {
                     this.DesiredTranslationVector = new(
@@ -245,7 +268,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
         private Size Measure_Centred_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
         {
-            Measure_Unbounded(radialLocations, out double r, out Rect totalChildrenBoundary);
+            Measure_Unbounded(radialLocations, out double rX, out double rY, out Rect totalChildrenBoundary);
 
             double halfWidth = Math.Max(
                 Math.Abs(totalChildrenBoundary.Left),
@@ -255,39 +278,44 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 Math.Abs(totalChildrenBoundary.Top),
                 Math.Abs(totalChildrenBoundary.Bottom));
 
-            this.DesiredRadius = r;
+            this.DesiredRadiusX = rX;
+            this.DesiredRadiusY = rY;
             this.DesiredTranslationVector = null; // Align to the centre of the finalSize
             return new(halfWidth * 2, halfHeight * 2);
         }
 
         private Size Measure_Uncentred_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
         {
-            Measure_Unbounded(radialLocations, out double r, out Rect totalChildrenBoundary);
+            Measure_Unbounded(radialLocations, out double rX, out double rY, out Rect totalChildrenBoundary);
 
-            this.DesiredRadius = r;
+            this.DesiredRadiusX = rX;
+            this.DesiredRadiusY = rY;
             this.DesiredTranslationVector = new(
                 -totalChildrenBoundary.Left,
                 -totalChildrenBoundary.Top);
             return totalChildrenBoundary.ToSize();
         }
 
-        private void Measure_Unbounded(IReadOnlyList<RadialLocation> radialLocations, out double r, out Rect totalChildrenBoundary)
+        private void Measure_Unbounded(IReadOnlyList<RadialLocation> radialLocations, out double rX, out double rY, out Rect totalChildrenBoundary)
         {
-            r = 0;
+            rX = 0;
+            rY = 0;
             for (int i = 1; i < radialLocations.Count; i++)
             {
                 for (int j = 0; j < i; j++)
                 {
-                    var r_ij = RadialLocation.CalculateMinR_NoBoundsOverlap(radialLocations[i], radialLocations[j]);
+                    var (rX_ij, rY_ij) = RadialLocation.CalculateMinR_NoBoundsOverlap(radialLocations[i], radialLocations[j]);
+                    ApplyCircularLayoutIfRequired(ref rX_ij, ref rY_ij);
 
-                    r = Math.Max(r, r_ij);
+                    rX = Math.Max(rX, rX_ij);
+                    rY = Math.Max(rY, rY_ij);
                 }
             }
 
             totalChildrenBoundary = new();
             foreach (var radialLocation in radialLocations)
             {
-                var childBoundary = radialLocation.Boundary(r);
+                var childBoundary = radialLocation.Boundary(rX, rY);
 
                 totalChildrenBoundary.Union(childBoundary);
             }
@@ -295,25 +323,32 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
         private Size Measure_Centred_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
         {
-            double r = double.PositiveInfinity;
+            double rX = double.PositiveInfinity;
+            double rY = double.PositiveInfinity;
 
             foreach (var radialLocation in radialLocations)
             {
                 var w = (availableSize.Width / 2) - (radialLocation.Size.Width / 2);
                 var h = (availableSize.Height / 2) - (radialLocation.Size.Height / 2);
 
-                var childR = Math.Min(Math.Abs(w / radialLocation.Cosθ), Math.Abs(h / radialLocation.Sinθ));
-                r = Math.Min(childR, r);
+                var childRX = Math.Abs(w / radialLocation.Cosθ);
+                var childRY = Math.Abs(h / radialLocation.Sinθ);
+
+                ApplyCircularLayoutIfRequired(ref childRX, ref childRY);
+
+                rX = Math.Min(childRX, rX);
+                rY = Math.Min(childRY, rY);
             }
 
-            this.DesiredRadius = r;
+            this.DesiredRadiusX = rX;
+            this.DesiredRadiusY = rY;
 
             if (double.IsInfinity(availableSize.Width) || double.IsInfinity(availableSize.Height))
             {
                 Rect totalChildrenBoundary = new();
                 foreach (var radialLocation in radialLocations)
                 {
-                    var childBoundary = radialLocation.Boundary(r);
+                    var childBoundary = radialLocation.Boundary(rX, rY);
 
                     totalChildrenBoundary.Union(childBoundary);
                 }
@@ -340,10 +375,11 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
         private Size Measure_Uncentred_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
         {
-            var r = RadialLocation.CalculateMaxR_WithinBounds(radialLocations[0], radialLocations[1], availableSize);
+            var (rX, rY) = RadialLocation.CalculateMaxR_WithinBounds(radialLocations[0], radialLocations[1], availableSize);
+            ApplyCircularLayoutIfRequired(ref rX, ref rY);
 
-            var child0Boundary = radialLocations[0].Boundary(r);
-            var child1Boundary = radialLocations[1].Boundary(r);
+            var child0Boundary = radialLocations[0].Boundary(rX, rY);
+            var child1Boundary = radialLocations[1].Boundary(rX, rY);
 
             Rect panelDesiredBoundary = child0Boundary;
             panelDesiredBoundary.Union(child1Boundary);
@@ -351,7 +387,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             for (int i = 2; i < radialLocations.Count; i++)
             {
                 RadialLocation radialLocation = radialLocations[i];
-                var childBoundary = radialLocation.Boundary(r);
+                var childBoundary = radialLocation.Boundary(rX, rY);
 
                 Rect requestedBoundary = panelDesiredBoundary;
                 requestedBoundary.Union(childBoundary);
@@ -359,21 +395,25 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 if ((requestedBoundary.Width > availableSize.Width) ||
                     (requestedBoundary.Height > availableSize.Height))
                 {
-                    // The current r is too large to accomodate the resulting childern layouts.
-                    // Find a new value for r which will accomodate all children.
+                    // The current radii are too large to accomodate the resulting childern layouts.
+                    // Find a new value for rX and rY which will accomodate all children.
                     for (int j = 0; j < i; j++)
                     {
                         RadialLocation prevRadialLocation = radialLocations[j];
-                        var r_ij = RadialLocation.CalculateMaxR_WithinBounds(radialLocation, prevRadialLocation, availableSize);
-                        r = Math.Min(r, r_ij);
+                        var (rX_ij, rY_ij) = RadialLocation.CalculateMaxR_WithinBounds(radialLocation, prevRadialLocation, availableSize);
+
+                        ApplyCircularLayoutIfRequired(ref rX_ij, ref rY_ij);
+
+                        rX = Math.Min(rX_ij, rX);
+                        rY = Math.Min(rY_ij, rY);
                     }
 
-                    // Using the new r, recalculate the desire boundary.
-                    Rect newBoundary = radialLocation.Boundary(r);
+                    // Using the new radii, recalculate the desire boundary.
+                    Rect newBoundary = radialLocation.Boundary(rX, rY);
                     for (int j = 0; j < i; j++)
                     {
                         RadialLocation jRadialLocation = radialLocations[j];
-                        var jChildBoundary = jRadialLocation.Boundary(r);
+                        var jChildBoundary = jRadialLocation.Boundary(rX, rY);
                         newBoundary.Union(jChildBoundary);
                     }
 
@@ -385,7 +425,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 }
             }
 
-            this.DesiredRadius = r;
+            this.DesiredRadiusX = rX;
+            this.DesiredRadiusY = rY;
             double translationX = double.IsInfinity(availableSize.Width)
                 ? -panelDesiredBoundary.Left
                 : -panelDesiredBoundary.Left + ((availableSize.Width - panelDesiredBoundary.Width) / 2);
@@ -399,14 +440,24 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             return desiredSize;
         }
 
+        private void ApplyCircularLayoutIfRequired(ref double rX, ref double rY)
+        {
+            if (this.IsLayoutCircular)
+            {
+                var r = Math.Min(rX, rY);
+                rX = r;
+                rY = r;
+            }
+        }
+
         /// <summary>
-        /// Arranges the content of the <see cref="CircularPanel"/>.
+        /// Arranges the content of the <see cref="EllipticalPanel"/>.
         /// </summary>
         /// <param name="finalSize">
         /// The final area within the parent that this element should use to arrange itself and its children.
         /// </param>
         /// <returns>
-        /// The actual size used by the <see cref="CircularPanel"/>.
+        /// The actual size used by the <see cref="EllipticalPanel"/>.
         /// </returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
@@ -424,7 +475,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             foreach (var child in this.Children)
             {
                 RadialLocation radialLocation = new(θ, child.DesiredSize);
-                var childBoundary = radialLocation.Boundary(this.DesiredRadius);
+                var childBoundary = radialLocation.Boundary(this.DesiredRadiusX, this.DesiredRadiusY);
                 childBoundary = new(
                     childBoundary.X + translationX,
                     childBoundary.Y + translationY,
@@ -442,17 +493,17 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         private readonly struct RadialLocation
         {
             /// <summary>
-            /// Calculate the maximum arrangement radius (r) which will accomodate the radial locations rl1 and rl2 within
+            /// Calculate the maximum arrangement radii which will accomodate the radial locations rl1 and rl2 within
             /// the bounds of the given size.
             /// </summary>
-            public static double CalculateMaxR_WithinBounds(RadialLocation rl1, RadialLocation rl2, Size availableSize)
+            public static (double, double) CalculateMaxR_WithinBounds(RadialLocation rl1, RadialLocation rl2, Size availableSize)
             {
                 /* ************************************************************** *\
                  * Child's left:   l = (r * cos(θ)) - (w/2)
                  * Child's right:  r = (r * cos(θ)) + (w/2)
                  * Child's top:    t = (r * -sin(θ)) - (h/2)
                  * Child's bottom: b = (r * -sin(θ)) + (h/2)
-
+                 *
                  * The bounds of r are given by:
                  *
                  * child1.Left - child2.Right <= availableSize.Width (W)
@@ -472,21 +523,20 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 var r_Width = widthDividend / Math.Abs(rl1.Cosθ - rl2.Cosθ);
                 var r_Height = heightDividend / Math.Abs(rl1.Sinθ - rl2.Sinθ);
 
-                var r = Math.Min(r_Width, r_Height);
-                return r;
+                return (r_Width, r_Height);
             }
 
             /// <summary>
-            /// Calculate the minimum arrangement radius (r) which will accomodate the radial locations rl1 and rl2
+            /// Calculate the minimum arrangement radii which will accomodate the radial locations rl1 and rl2
             /// without overlapping the children controls.
             /// </summary>
-            public static double CalculateMinR_NoBoundsOverlap(RadialLocation rl1, RadialLocation rl2)
+            public static (double, double) CalculateMinR_NoBoundsOverlap(RadialLocation rl1, RadialLocation rl2)
             {
                 // If two children at at the same radial location, then ignore for purposes of spacing
                 // Error bound chosen as a small number at random (no particular meaning)
                 if (DoubleHelper.EqualsWithinError(rl1.Cosθ, rl2.Cosθ, 1e-5))
                 {
-                    return 0;
+                    return (0, 0);
                 }
 
                 /* ************************************************************** *\
@@ -518,11 +568,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                  *  r > (h1+h2) / 2(ABS(sin(θ1) - sin(θ2)))
                 \* ************************************************************** */
 
-                double r_Width = (rl1.Size.Width + rl2.Size.Width) / (2 * Math.Abs(rl1.Cosθ - rl2.Cosθ));
-                double r_Height = (rl1.Size.Height + rl2.Size.Height) / (2 * Math.Abs(rl1.Sinθ - rl2.Sinθ));
+                double rX = (rl1.Size.Width + rl2.Size.Width) / (2 * Math.Abs(rl1.Cosθ - rl2.Cosθ));
+                double rY = (rl1.Size.Height + rl2.Size.Height) / (2 * Math.Abs(rl1.Sinθ - rl2.Sinθ));
 
-                var r = Math.Min(r_Width, r_Height);
-                return r;
+                return (rX, rY);
             }
 
             public RadialLocation(double θ, Size size)
@@ -538,9 +587,9 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
             public Size Size { get; }
 
-            public Rect Boundary(double r) => new(
-                (r * Cosθ) - (Size.Width / 2),
-                (r * -Sinθ) - (Size.Height / 2), // Negative y to 'switch' from Cartisean co-ordinates (where increasing y is traditionally "up") to panel co-ordinates (where increasing y is "down")
+            public Rect Boundary(double rX, double rY) => new(
+                (rX * Cosθ) - (Size.Width / 2),
+                (rY * -Sinθ) - (Size.Height / 2), // Negative y to 'switch' from Cartisean co-ordinates (where increasing y is traditionally "up") to panel co-ordinates (where increasing y is "down")
                 Size.Width,
                 Size.Height);
         }

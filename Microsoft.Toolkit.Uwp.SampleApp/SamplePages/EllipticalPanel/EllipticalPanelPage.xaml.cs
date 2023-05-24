@@ -7,9 +7,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace Microsoft.Toolkit.Uwp.SampleApp.SamplePages
 {
-    public sealed partial class CircularPanelPage : Page, IXamlRenderListener
+    public sealed partial class EllipticalPanelPage : Page, IXamlRenderListener
     {
-        public CircularPanelPage()
+        public EllipticalPanelPage()
         {
             this.InitializeComponent();
         }
