@@ -278,6 +278,16 @@
         "DocumentationUrl": "https://raw.githubusercontent.com/MicrosoftDocs/WindowsCommunityToolkitDocs/master/docs/controls/OrbitView.md"
       },
       {
+        "Name": "RadialCanvas",
+        "Type": "RadialCanvasPage",
+        "Subcategory": "Layout",
+        "About": "The RadialCanvas layout acts in the same way as a Canvas, but each items location is specified using polar cooridinates (i.e. a radius and angle).",
+        "CodeUrl": "https://github.com/CommunityToolkit/WindowsCommunityToolkit/tree/main/Microsoft.Toolkit.Uwp.UI.Controls.Layout/RadialCanvas",
+        "XamlCodeFile": "RadialCanvasXaml.bind",
+        "Icon": "/SamplePages/RadialCanvas/RadialCanvas.png",
+        "DocumentationUrl": "https://raw.githubusercontent.com/MicrosoftDocs/WindowsCommunityToolkitDocs/master/docs/controls/RadialCanvas.md"
+      },
+      {
         "Name": "Menu",
         "Type": "MenuPage",
         "Subcategory": "Menus and Toolbars",

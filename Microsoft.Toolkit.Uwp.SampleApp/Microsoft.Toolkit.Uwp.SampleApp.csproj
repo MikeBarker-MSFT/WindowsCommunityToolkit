@@ -281,6 +281,7 @@
     <Content Include="SamplePages\Graph\PersonView.png" />
     <Content Include="SamplePages\Primitives\ConstrainedBox.png" />
     <Content Include="SamplePages\Primitives\SwitchPresenter.png" />
+    <Content Include="SamplePages\RadialCanvas\RadialCanvas.png" />
     <Content Include="SamplePages\RichSuggestBox\RichSuggestBox.png" />
     <Content Include="SamplePages\TabbedCommandBar\TabbedCommandBar.png" />
     <Content Include="SamplePages\Animations\Effects\FadeBehavior.png" />
@@ -515,6 +516,9 @@
     <Compile Include="SamplePages\MetadataControl\MetadataControlPage.xaml.cs">
       <DependentUpon>MetadataControlPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SamplePages\RadialCanvas\RadialCanvasPage.xaml.cs">
+      <DependentUpon>RadialCanvasPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SamplePages\Shadows\AttachedDropShadowPage.xaml.cs">
       <DependentUpon>AttachedDropShadowPage.xaml</DependentUpon>
     </Compile>
@@ -647,6 +651,7 @@
     <Content Include="SamplePages\Animations\Shadows\AnimatedCardShadowXaml.bind" />
     <Content Include="SamplePages\KeyDownTriggerBehavior\KeyDownTriggerBehaviorXaml.bind" />
     <Content Include="SamplePages\RichSuggestBox\RichSuggestBoxCode.bind" />
+    <Content Include="SamplePages\RadialCanvas\RadialCanvasXaml.bind" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -1002,6 +1007,10 @@
     <Content Include="SamplePages\Primitives\SwitchPresenter.bind">
       <SubType>Designer</SubType>
     </Content>
+    <Page Include="SamplePages\RadialCanvas\RadialCanvasPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SamplePages\Shadows\AttachedDropShadowPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
