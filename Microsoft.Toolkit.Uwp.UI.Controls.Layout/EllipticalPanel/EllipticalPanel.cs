@@ -56,22 +56,31 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             new(false, HandleMeasure));
 
         /// <summary>
-        /// Gets the <see cref="IsOriginAtCentre"/> XAML dependency property.
+        /// Gets the <see cref="IncludeFullLayoutEllipse"/> XAML dependency property.
         /// </summary>
-        public static DependencyProperty IsOriginAtCentreProperty { get; } = DependencyProperty.Register(
-            nameof(IsOriginAtCentre),
+        public static DependencyProperty IncludeFullLayoutEllipseProperty { get; } = DependencyProperty.Register(
+            nameof(IncludeFullLayoutEllipse),
             typeof(bool),
             typeof(EllipticalPanel),
             new(true, HandleMeasure));
 
         /// <summary>
-        /// Gets the <see cref="IsLayoutCircular"/> XAML dependency property.
+        /// Gets the <see cref="HorizontalContentAlignment"/> XAML dependency property.
         /// </summary>
-        public static DependencyProperty IsLayoutCircularProperty { get; } = DependencyProperty.Register(
-            nameof(IsLayoutCircular),
-            typeof(bool),
+        public static DependencyProperty HorizontalContentAlignmentProperty { get; } = DependencyProperty.Register(
+            nameof(HorizontalContentAlignment),
+            typeof(HorizontalAlignment),
             typeof(EllipticalPanel),
-            new(true, HandleMeasure));
+            new(HorizontalAlignment.Center, HandleMeasure));
+
+        /// <summary>
+        /// Gets the <see cref="VerticalContentAlignment"/> XAML dependency property.
+        /// </summary>
+        public static DependencyProperty VerticalContentAlignmentProperty { get; } = DependencyProperty.Register(
+            nameof(VerticalContentAlignment),
+            typeof(VerticalAlignment),
+            typeof(EllipticalPanel),
+            new(VerticalAlignment.Center, HandleMeasure));
 
         private static void HandleMeasure(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -83,10 +92,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         /// <summary>
         /// Gets or sets the angle from which childern are laid out in a circle.
         /// </summary>
-        /// <remarks>
+        /// <value>
         /// The angle is denoted in radians. The reference direction is to the right, and
-        /// increasing angles result in a rotation couter-clockwise.
-        /// </remarks>
+        /// increasing angles result in a rotation couter-clockwise. The default value is -Pi/2.
+        /// </value>
         public double ArcStart
         {
             get { return (double)GetValue(ArcStartProperty); }
@@ -96,10 +105,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         /// <summary>
         /// Gets or sets the angle upto which childern are laid out in a circle.
         /// </summary>
-        /// <remarks>
+        /// <value>
         /// The angle is denoted in radians. The reference direction is to the right, and
-        /// increasing angles result in a rotation couter-clockwise.
-        /// </remarks>
+        /// increasing angles result in a rotation couter-clockwise. The default value is 3Pi/2.
+        /// </value>
         public double ArcEnd
         {
             get { return (double)GetValue(ArcEndProperty); }
@@ -109,10 +118,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         /// <summary>
         /// Gets or sets a value indicating whether the first child is located at <see cref="ArcStart"/>.
         /// </summary>
-        /// <remarks>
-        /// If true the first child is located at <see cref="ArcStart"/>; otherwise the first child is
-        /// located at one angular step after <see cref="ArcStart"/>.
-        /// </remarks>
+        /// <value>
+        /// true if the first child is located at <see cref="ArcStart"/>; otherwise the first child is
+        /// located at one angular step after <see cref="ArcStart"/>. The default value is true.
+        /// </value>
         public bool ArcStartIncluded
         {
             get { return (bool)GetValue(ArcStartIncludedProperty); }
@@ -122,10 +131,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         /// <summary>
         /// Gets or sets a value indicating whether the last child is located at <see cref="ArcEnd"/>.
         /// </summary>
-        /// <remarks>
-        /// If true the last child is located at <see cref="ArcEnd"/>; otherwise the last child is
-        /// located at one angular step before <see cref="ArcEnd"/>.
-        /// </remarks>
+        /// <value>
+        /// true if the last child is located at <see cref="ArcEnd"/>; otherwise the last child is
+        /// located at one angular step before <see cref="ArcEnd"/>. The default value is false.
+        /// </value>
         public bool ArcEndIncluded
         {
             get { return (bool)GetValue(ArcEndIncludedProperty); }
@@ -133,30 +142,48 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the centre of the layout circle (on which the children are located)
-        /// is at the centre of the <see cref="EllipticalPanel"/>.
+        /// Gets or sets a value indicating whether the full layout circle is contained within the
+        /// bounds of the <see cref="EllipticalPanel"/>.
         /// </summary>
-        public bool IsOriginAtCentre
+        /// <value>
+        /// true if the <see cref="EllipticalPanel"/> contains the full layout circle within its bounds;
+        /// otherwise only the arc containing child elements is displayed. The default value is true.
+        /// </value>
+        public bool IncludeFullLayoutEllipse
         {
-            get { return (bool)GetValue(IsOriginAtCentreProperty); }
-            set { SetValue(IsOriginAtCentreProperty, value); }
+            get { return (bool)GetValue(IncludeFullLayoutEllipseProperty); }
+            set { SetValue(IncludeFullLayoutEllipseProperty, value); }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the layout is circular where the X and Y radii
-        /// are equal, or elliptical where the layout is stretched to fill the space avilable.
+        /// Gets or sets the horizontal alignment of the panel's content.
         /// </summary>
-        public bool IsLayoutCircular
+        /// <value>
+        /// One of the HorizontalAlignment values. The default is <see cref="HorizontalAlignment.Center"/>.
+        /// </value>
+        public HorizontalAlignment HorizontalContentAlignment
         {
-            get { return (bool)GetValue(IsLayoutCircularProperty); }
-            set { SetValue(IsLayoutCircularProperty, value); }
+            get { return (HorizontalAlignment)GetValue(HorizontalContentAlignmentProperty); }
+            set { SetValue(HorizontalContentAlignmentProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the vertical alignment of the panel's content.
+        /// </summary>
+        /// <value>
+        /// One of the VerticalAlignment values. The default is <see cref="VerticalAlignment.Center"/>.
+        /// </value>
+        public VerticalAlignment VerticalContentAlignment
+        {
+            get { return (VerticalAlignment)GetValue(VerticalContentAlignmentProperty); }
+            set { SetValue(VerticalContentAlignmentProperty, value); }
         }
 
         private double DesiredRadiusX { get; set; } = double.NaN;
 
         private double DesiredRadiusY { get; set; } = double.NaN;
 
-        private Point? DesiredTranslationVector { get; set; } = default;
+        private Rect DesiredContentBoundary { get; set; } = Rect.Empty;
 
         /// <summary>
         /// Provides the behavior for the "Measure" pass of the layout cycle.
@@ -177,7 +204,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             {
                 this.DesiredRadiusX = double.NaN;
                 this.DesiredRadiusY = double.NaN;
-                this.DesiredTranslationVector = default;
+                this.DesiredContentBoundary = new(0, 0, 0, 0);
                 return new(0, 0);
             }
 
@@ -188,9 +215,11 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
                 this.DesiredRadiusX = 0;
                 this.DesiredRadiusY = 0;
-                this.DesiredTranslationVector = new(
-                    availableSize.Width / 2,
-                    availableSize.Height / 2);
+                this.DesiredContentBoundary = new(
+                    -child.DesiredSize.Width / 2,
+                    -child.DesiredSize.Height / 2,
+                    child.DesiredSize.Width,
+                    child.DesiredSize.Height);
                 return new(child.DesiredSize.Width, child.DesiredSize.Height);
             }
 
@@ -207,19 +236,11 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
 
                 this.DesiredRadiusX = 0;
                 this.DesiredRadiusY = 0;
-                if (double.IsInfinity(availableSize.Width) && double.IsInfinity(availableSize.Height))
-                {
-                    this.DesiredTranslationVector = new(
-                        maxChildWidth / 2,
-                        maxChildHeight / 2);
-                }
-                else
-                {
-                    this.DesiredTranslationVector = new(
-                        availableSize.Width / 2,
-                        availableSize.Height / 2);
-                }
-
+                this.DesiredContentBoundary = new(
+                    -maxChildWidth / 2,
+                    -maxChildHeight / 2,
+                    maxChildWidth,
+                    maxChildHeight);
                 return new(maxChildWidth, maxChildHeight);
             }
 
@@ -236,63 +257,57 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             {
                 child.Measure(availableSize);
 
-                // TODO: Handle DesiredSize is > AvailableSize
-                radialLocations.Add(new(θ, child.DesiredSize));
+                // If the child size exceeds the available bounds do not consider further it for measure purposes.
+                if ((child.DesiredSize.Width <= availableSize.Width) &&
+                    (child.DesiredSize.Height <= availableSize.Height))
+                {
+                    radialLocations.Add(new(θ, child.DesiredSize));
+                }
 
                 θ += segmentArc;
             }
 
             if (double.IsInfinity(availableSize.Width) && double.IsInfinity(availableSize.Height))
             {
-                if (this.IsOriginAtCentre)
+                if (this.IncludeFullLayoutEllipse)
                 {
-                    return Measure_Centred_Unbounded(radialLocations);
+                    return Measure_FullLayout_Unbounded(radialLocations);
                 }
                 else
                 {
-                    return Measure_Uncentred_Unbounded(radialLocations);
+                    return Measure_PartialLayout_Unbounded(radialLocations);
                 }
             }
             else
             {
-                if (this.IsOriginAtCentre)
+                if (this.IncludeFullLayoutEllipse)
                 {
-                    return Measure_Centred_Bounded(availableSize, radialLocations);
+                    return Measure_FullLayout_Bounded(availableSize, radialLocations);
                 }
                 else
                 {
-                    return Measure_Uncentred_Bounded(availableSize, radialLocations);
+                    return Measure_PartialLayout_Bounded(availableSize, radialLocations);
                 }
             }
         }
 
-        private Size Measure_Centred_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
+        private Size Measure_FullLayout_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
         {
             Measure_Unbounded(radialLocations, out double rX, out double rY, out Rect totalChildrenBoundary);
 
-            double halfWidth = Math.Max(
-                Math.Abs(totalChildrenBoundary.Left),
-                Math.Abs(totalChildrenBoundary.Right));
-
-            double halfHeight = Math.Max(
-                Math.Abs(totalChildrenBoundary.Top),
-                Math.Abs(totalChildrenBoundary.Bottom));
-
             this.DesiredRadiusX = rX;
             this.DesiredRadiusY = rY;
-            this.DesiredTranslationVector = null; // Align to the centre of the finalSize
-            return new(halfWidth * 2, halfHeight * 2);
+            this.DesiredContentBoundary = CalculateFullLayoutContentBoundary(totalChildrenBoundary);
+            return this.DesiredContentBoundary.ToSize();
         }
 
-        private Size Measure_Uncentred_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
+        private Size Measure_PartialLayout_Unbounded(IReadOnlyList<RadialLocation> radialLocations)
         {
             Measure_Unbounded(radialLocations, out double rX, out double rY, out Rect totalChildrenBoundary);
 
             this.DesiredRadiusX = rX;
             this.DesiredRadiusY = rY;
-            this.DesiredTranslationVector = new(
-                -totalChildrenBoundary.Left,
-                -totalChildrenBoundary.Top);
+            this.DesiredContentBoundary = totalChildrenBoundary;
             return totalChildrenBoundary.ToSize();
         }
 
@@ -305,7 +320,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 for (int j = 0; j < i; j++)
                 {
                     var (rX_ij, rY_ij) = RadialLocation.CalculateMinR_NoBoundsOverlap(radialLocations[i], radialLocations[j]);
-                    ApplyCircularLayoutIfRequired(ref rX_ij, ref rY_ij);
+                    EnforceStretchContentAlignment(ref rX_ij, ref rY_ij);
 
                     rX = Math.Max(rX, rX_ij);
                     rY = Math.Max(rY, rY_ij);
@@ -321,7 +336,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
             }
         }
 
-        private Size Measure_Centred_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
+        private Size Measure_FullLayout_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
         {
             double rX = double.PositiveInfinity;
             double rY = double.PositiveInfinity;
@@ -334,25 +349,26 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 var childRX = Math.Abs(w / radialLocation.Cosθ);
                 var childRY = Math.Abs(h / radialLocation.Sinθ);
 
-                ApplyCircularLayoutIfRequired(ref childRX, ref childRY);
+                EnforceStretchContentAlignment(ref childRX, ref childRY);
 
                 rX = Math.Min(childRX, rX);
                 rY = Math.Min(childRY, rY);
             }
 
+            Rect totalChildrenBoundary = new();
+            foreach (var radialLocation in radialLocations)
+            {
+                var childBoundary = radialLocation.Boundary(rX, rY);
+
+                totalChildrenBoundary.Union(childBoundary);
+            }
+
             this.DesiredRadiusX = rX;
             this.DesiredRadiusY = rY;
+            this.DesiredContentBoundary = CalculateFullLayoutContentBoundary(totalChildrenBoundary);
 
             if (double.IsInfinity(availableSize.Width) || double.IsInfinity(availableSize.Height))
             {
-                Rect totalChildrenBoundary = new();
-                foreach (var radialLocation in radialLocations)
-                {
-                    var childBoundary = radialLocation.Boundary(rX, rY);
-
-                    totalChildrenBoundary.Union(childBoundary);
-                }
-
                 double desiredWidth = double.IsInfinity(availableSize.Width)
                     ? totalChildrenBoundary.Width
                     : availableSize.Width;
@@ -362,34 +378,32 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                     : availableSize.Height;
 
                 Size desiredSize = new Size(desiredWidth, desiredHeight);
-                this.DesiredTranslationVector = null; // Align to the centre of the finalSize
                 return desiredSize;
             }
             else
             {
                 Size desiredSize = availableSize;
-                this.DesiredTranslationVector = null; // Align to the centre of the finalSize
                 return desiredSize;
             }
         }
 
-        private Size Measure_Uncentred_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
+        private Size Measure_PartialLayout_Bounded(Size availableSize, IReadOnlyList<RadialLocation> radialLocations)
         {
             var (rX, rY) = RadialLocation.CalculateMaxR_WithinBounds(radialLocations[0], radialLocations[1], availableSize);
-            ApplyCircularLayoutIfRequired(ref rX, ref rY);
+            EnforceStretchContentAlignment(ref rX, ref rY);
 
             var child0Boundary = radialLocations[0].Boundary(rX, rY);
             var child1Boundary = radialLocations[1].Boundary(rX, rY);
 
-            Rect panelDesiredBoundary = child0Boundary;
-            panelDesiredBoundary.Union(child1Boundary);
+            Rect totalChildrenBoundary = child0Boundary;
+            totalChildrenBoundary.Union(child1Boundary);
 
             for (int i = 2; i < radialLocations.Count; i++)
             {
                 RadialLocation radialLocation = radialLocations[i];
                 var childBoundary = radialLocation.Boundary(rX, rY);
 
-                Rect requestedBoundary = panelDesiredBoundary;
+                Rect requestedBoundary = totalChildrenBoundary;
                 requestedBoundary.Union(childBoundary);
 
                 if ((requestedBoundary.Width > availableSize.Width) ||
@@ -402,7 +416,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                         RadialLocation prevRadialLocation = radialLocations[j];
                         var (rX_ij, rY_ij) = RadialLocation.CalculateMaxR_WithinBounds(radialLocation, prevRadialLocation, availableSize);
 
-                        ApplyCircularLayoutIfRequired(ref rX_ij, ref rY_ij);
+                        EnforceStretchContentAlignment(ref rX_ij, ref rY_ij);
 
                         rX = Math.Min(rX_ij, rX);
                         rY = Math.Min(rY_ij, rY);
@@ -417,37 +431,85 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                         newBoundary.Union(jChildBoundary);
                     }
 
-                    panelDesiredBoundary = newBoundary;
+                    totalChildrenBoundary = newBoundary;
                 }
                 else
                 {
-                    panelDesiredBoundary = requestedBoundary;
+                    totalChildrenBoundary = requestedBoundary;
                 }
             }
 
             this.DesiredRadiusX = rX;
             this.DesiredRadiusY = rY;
-            double translationX = double.IsInfinity(availableSize.Width)
-                ? -panelDesiredBoundary.Left
-                : -panelDesiredBoundary.Left + ((availableSize.Width - panelDesiredBoundary.Width) / 2);
-
-            double translationY = double.IsInfinity(availableSize.Height)
-                ? -panelDesiredBoundary.Top
-                : -panelDesiredBoundary.Top + ((availableSize.Height - panelDesiredBoundary.Height) / 2);
-
-            this.DesiredTranslationVector = new(translationX, translationY);
-            Size desiredSize = panelDesiredBoundary.ToSize();
-            return desiredSize;
+            this.DesiredContentBoundary = totalChildrenBoundary;
+            return totalChildrenBoundary.ToSize();
         }
 
-        private void ApplyCircularLayoutIfRequired(ref double rX, ref double rY)
+        private void EnforceStretchContentAlignment(ref double rX, ref double rY)
         {
-            if (this.IsLayoutCircular)
+            var r = Math.Min(rX, rY);
+
+            if (this.HorizontalContentAlignment != HorizontalAlignment.Stretch)
             {
-                var r = Math.Min(rX, rY);
                 rX = r;
+            }
+
+            if (this.VerticalContentAlignment != VerticalAlignment.Stretch)
+            {
                 rY = r;
             }
+        }
+
+        private Rect CalculateFullLayoutContentBoundary(Rect totalChildrenBoundary)
+        {
+            double halfWidth = Math.Max(
+                Math.Abs(totalChildrenBoundary.Left),
+                Math.Abs(totalChildrenBoundary.Right));
+
+            double halfHeight = Math.Max(
+                Math.Abs(totalChildrenBoundary.Top),
+                Math.Abs(totalChildrenBoundary.Bottom));
+
+            return new(-halfWidth, -halfHeight, halfWidth * 2, halfHeight * 2);
+        }
+
+        private (double, double) CalculateTranslationVector(Size finalSize, Rect contentBoundary)
+        {
+            double translateX;
+            switch (this.HorizontalContentAlignment)
+            {
+                case HorizontalAlignment.Left:
+                    translateX = -contentBoundary.Left;
+                    break;
+                case HorizontalAlignment.Right:
+                    translateX = finalSize.Width - contentBoundary.Right;
+                    break;
+                case HorizontalAlignment.Center:
+                case HorizontalAlignment.Stretch:
+                    translateX = (finalSize.Width / 2) - (contentBoundary.Left + (contentBoundary.Width / 2));
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid value set for HorizontalContentAlignment.");
+            }
+
+            double translateY;
+            switch (this.VerticalContentAlignment)
+            {
+                case VerticalAlignment.Top:
+                    translateY = -contentBoundary.Top;
+                    break;
+                case VerticalAlignment.Bottom:
+                    translateY = finalSize.Height - contentBoundary.Bottom;
+                    break;
+                case VerticalAlignment.Center:
+                case VerticalAlignment.Stretch:
+                    translateY = (finalSize.Height / 2) - (contentBoundary.Top + (contentBoundary.Height / 2));
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid value set for VerticalContentAlignment.");
+            }
+
+            return (translateX, translateY);
         }
 
         /// <summary>
@@ -461,8 +523,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
         /// </returns>
         protected override Size ArrangeOverride(Size finalSize)
         {
-            double translationX = this.DesiredTranslationVector?.X ?? (finalSize.Width / 2);
-            double translationY = this.DesiredTranslationVector?.Y ?? (finalSize.Height / 2);
+            var (translateX, translateY) = CalculateTranslationVector(finalSize, this.DesiredContentBoundary);
 
             var numberOfSegments = this.Children.Count - 1
                 + (this.ArcStartIncluded ? 0 : 1)
@@ -477,8 +538,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Controls
                 RadialLocation radialLocation = new(θ, child.DesiredSize);
                 var childBoundary = radialLocation.Boundary(this.DesiredRadiusX, this.DesiredRadiusY);
                 childBoundary = new(
-                    childBoundary.X + translationX,
-                    childBoundary.Y + translationY,
+                    childBoundary.X + translateX,
+                    childBoundary.Y + translateY,
                     childBoundary.Width,
                     childBoundary.Height);
 

@@ -12,8 +12,9 @@
         ArcStartIncluded="@[Arc Start Included:Bool:true]"
         ArcEnd="@[Arc End:DoubleSlider:0:-6.3-6.3]"
         ArcEndIncluded="@[Arc End Included:Bool:true]"
-        IsOriginAtCentre="@[Is Origin At Centre:Bool:false]"
-        IsLayoutCircular="@[Circular Layout:Bool:true]"
+        IncludeFullLayoutEllipse="@[Include Full Layout Ellipse:Bool:false]"
+        HorizontalContentAlignment="@[Horizontal Content Alignment:Enum:HorizontalAlignment.Center]"
+        VerticalContentAlignment="@[Vertical Content Alignment:Enum:VerticalAlignment.Center]"
         >
 
         <Ellipse Fill="Red" Width="@[Child Width:Slider:24:1-200]" Height="@[Child Height:Slider:24:1-200]" />
